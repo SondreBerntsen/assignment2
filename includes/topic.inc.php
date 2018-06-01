@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 // Check if user has actually clicked submit button or just went to the url for the signup file
 if (isset($_POST['submit'])) {
@@ -41,4 +42,9 @@ if (isset($_POST['submit'])) {
     // sends user to the signup page if they access signup file via URL
     header("Location: ../index.php?somethinghappened");
     exit();
+}
+
+function select_topic($topic) {
+  echo "I am here";
+  echo $topic;
 }

@@ -4,7 +4,7 @@ include_once 'templates/header.php';
 
 <!--signup form -->
 
-<form class="registrationform" action="includes/signup.inc.php" method="POST">
+<form class="formwidth" action="includes/signup.inc.php" method="POST">
   <div class="form-group">
     <label for="username">Username</label>
     <input type="text" class="form-control" aria-describedby="usernameHelp" placeholder="Enter username" name="username">
