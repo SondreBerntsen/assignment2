@@ -9,6 +9,7 @@ if (isset($_POST['submit'])) {
     $topic_name = mysqli_real_escape_string($conn, $_POST['topic_name']);
     $user_id = $_SESSION['u_id'];
 
+
     //Error handlers
     // Check for empty fields
     if (empty($topic_name)) {
@@ -42,9 +43,4 @@ if (isset($_POST['submit'])) {
     // sends user to the signup page if they access signup file via URL
     header("Location: ../index.php?somethinghappened");
     exit();
-}
-
-function select_topic($topic) {
-  echo "I am here";
-  echo $topic;
 }
