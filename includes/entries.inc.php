@@ -7,11 +7,17 @@ if (isset($_POST['submit'])) {
     include_once 'dbh.inc.php';
 
     $user_id = $_SESSION['u_id'];
-    $topicTitle = mysqli_real_escape_string($conn, $_POST['topic']);
-    $topicId = "SELECT topic_id FROM topics WHERE title = $topicTitle";
+
     $title = mysqli_real_escape_string($conn, $_POST['title']);
     $content = mysqli_real_escape_string($conn, $_POST['content']);
     $publishedDate = date('d/m/Y');
+
+    $topic_name = mysqli_real_escape_string($conn, $_POST['topic']);
+    $select_topic_id = "SELECT topic_id FROM topics WHERE $topic_name = topic_name";
+    $topic_id_query = mysqli_query($conn, $select_topic_id);
+    $topic_id = mysqli_fetch_assoc($topic_id_query);
+
+
 
     //Error handlers
     // Check for empty fields
@@ -34,14 +40,9 @@ if (isset($_POST['submit'])) {
             exit();
             // Insert the entry into the database
             } else {
-              print_r($select_id);
-              print_r($topicId);
 
-              $sql = "INSERT INTO entries (user_id, title, content, pub_date) VALUES ('$user_id','$title','$content','$publishedDates')";
+              $sql = "INSERT INTO entries (user_id, title, content, pub_date, topic_id) VALUES ('$user_id','$title','$content','$publishedDate', '$topic_id')";
               mysqli_query($conn, $sql);
-
-              $sql3 = "INSERT INTO belongs_to(entry_id,topic_id) VALUES ('$select_id','$topicId')";
-              mysqli_query($conn, $sql3);
 
               header("Location: ../index.php?newentry=success");
 

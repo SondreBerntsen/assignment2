@@ -16,18 +16,6 @@ $query = "CREATE TABLE users(
   user_type ENUM('author', 'administrator'),
   PRIMARY KEY (user_id)
 )";
-
-$conn->query($query) or die ($conn->error);
-
-$query = "CREATE TABLE entries(
-  entry_id INT(20) NOT NULL AUTO_INCREMENT,
-  title VARCHAR(20) NOT NULL,
-  pub_date VARCHAR(255) NOT NULL,
-  user_id INT,
-  PRIMARY KEY (entry_id),
-  FOREIGN KEY (user_id) REFERENCES users(user_id)
-)";
-
 $conn->query($query) or die ($conn->error);
 
 $query = "CREATE TABLE topics(
@@ -39,15 +27,19 @@ $query = "CREATE TABLE topics(
 )";
 $conn->query($query) or die ($conn->error);
 
-$query = "CREATE TABLE belongs_to(
-  entry_id INT,
-  topic_id INT,
-  PRIMARY KEY (entry_id, topic_id),
-  FOREIGN KEY(entry_id) REFERENCES entries(entry_id),
-  FOREIGN KEY(topic_id) REFERENCES topics(topic_id)
-)";
 
+$query = "CREATE TABLE entries(
+  entry_id INT(20) NOT NULL AUTO_INCREMENT,
+  title VARCHAR(20) NOT NULL,
+  pub_date VARCHAR(255) NOT NULL,
+  user_id INT,
+  topic_id INT,
+  PRIMARY KEY (entry_id),
+  FOREIGN KEY (topic_id) REFERENCES topics(topic_id),
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
+)";
 $conn->query($query) or die ($conn->error);
+
 
 
 ?>

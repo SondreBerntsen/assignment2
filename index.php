@@ -27,6 +27,13 @@ if (isset($_SESSION['u_type'])) {
     <?php
       $sql = "SELECT * FROM topics ORDER BY topic_id DESC LIMIT 0,6";
       $result = mysqli_query($conn, $sql);
+
+      // $topic_name = mysqli_real_escape_string($conn, $_POST['topic']);
+      $select_topic_id = "SELECT topic_id FROM topics WHERE topic_name = 'Ultratopic'";
+      $topic_id_query = mysqli_query($conn, $select_topic_id);
+      $topic_id = mysqli_fetch_assoc($topic_id_query);
+
+      print_r($topic_id);
     ?>
 
     <div class="modal fade" id="entryModal" tabindex="-1" aria-hidden="true">
