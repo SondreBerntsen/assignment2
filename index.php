@@ -23,24 +23,18 @@ if (isset($_SESSION['u_type'])) {
 }
  ?>
 
-    <!-- Modals -->
+    <!-- NEW ENTRY MODAL FORM -->
+
     <?php
       $sql = "SELECT * FROM topics ORDER BY topic_id DESC LIMIT 0,6";
       $result = mysqli_query($conn, $sql);
-
-      // $topic_name = mysqli_real_escape_string($conn, $_POST['topic']);
-      $select_topic_id = "SELECT topic_id FROM topics WHERE topic_name = 'Ultratopic'";
-      $topic_id_query = mysqli_query($conn, $select_topic_id);
-      $topic_id = mysqli_fetch_assoc($topic_id_query);
-
-      print_r($topic_id);
     ?>
 
     <div class="modal fade" id="entryModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="entryModalLabel">Topic creation</h5>
+            <h5 class="modal-title" id="entryModalLabel">Entry Creation</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -57,10 +51,10 @@ if (isset($_SESSION['u_type'])) {
               </div>
               <div class="form-group">
                 <label for="exampleFormControlSelect1">Select topic</label>
-                <select class="form-control" name="topic">
+                <select class="form-control" name="topics">
                   <?php
                       while ($row = mysqli_fetch_array($result)) {
-                          echo "<option name=topic value='" . $row['topic_id'] . "'>" . $row['topic_name'] . "</option>";
+                          echo "<option name='topics' value='" . $row['topic_id'] . "'>" . $row['topic_name'] . "</option>";
                       }
                   ?>
                 </select>
@@ -72,6 +66,8 @@ if (isset($_SESSION['u_type'])) {
         </div>
       </div>
     </div>
+
+    <!-- NEW TOPIC FORM MODAL -->
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -106,7 +102,7 @@ if (isset($_SESSION['u_type'])) {
           $result = mysqli_query($conn, $sql);
 
           while ($row = mysqli_fetch_array($result)) {
-              echo '<a class=list-group-item list-group-item-action href=index.php?selected_topic=' . $row['topic_name'] . '>' . $row['topic_name'] . '</a>';
+              echo '<a class=list-group-item list-group-item-action href=index.php?selected_topic=' . $row['topic_id'] . '>' . $row['topic_name'] . '</a>';
           }
 
           if (isset($_SESSION['u_type'])) {
@@ -120,27 +116,38 @@ if (isset($_SESSION['u_type'])) {
       </div>
     </div>
     <div class="col">
-			  <div class="card">
-			    <div class="card-body">
-			      <h5 class="card-title">Card title</h5>
-			      <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam gravida dapibus vestibulum.</p>
-			      <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-			    </div>
-				  </div>
-				  <div class="card">
-				    <div class="card-body">
-				      <h5 class="card-title">Card title</h5>
-				      <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam gravida dapibus vestibulum.</p>
-				      <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-				    </div>
-				  </div>
-				  <div class="card">
-				    <div class="card-body">
-				      <h5 class="card-title">Card title</h5>
-				      <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam gravida dapibus vestibulum.</p>
-				      <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-				    </div>
-				  </div>
+      <?php
+      if (isset($_GET['selected_topic'])) {
+        $selected_entries = $_GET['selected_topic'];
+        $sql = "SELECT * FROM entries WHERE topic_id = $selected_entries";
+        $result = mysqli_query($conn, $sql);
+
+
+        $uid_query = "SELECT user_id FROM entries WHERE topic_id = '$selected_entries'";
+        $uid_from_entries = mysqli_query($conn, $uid_query);
+        $fetch_uid = mysqli_fetch_row($uid_from_entries);
+        $fetch_uid_string = implode($fetch_uid);
+
+
+        $username_query = "SELECT username FROM users WHERE user_id = '$fetch_uid_string'";
+        $username_from_users = mysqli_query($conn, $username_query);
+        $fetch_username = mysqli_fetch_row($username_from_users);
+        $fetch_username_string = implode($fetch_username);
+
+
+        while ($row = mysqli_fetch_array($result)) {
+            echo '<div class="card">
+          			    <div class="card-body">
+          			      <h5 class="card-title">' . $row['title'] . '</h5>
+          			      <p class="card-text">' . $row['content'] . '</p>
+          			      <p class="card-text"><small class="text-muted">Created by ' . $fetch_username_string . '</small></p>
+          			    </div>
+          				</div>';
+        }
+      }
+      ?>
+
+
 			</div>
     </div>
   </div>

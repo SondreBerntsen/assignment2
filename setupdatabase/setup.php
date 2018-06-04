@@ -31,7 +31,8 @@ $conn->query($query) or die ($conn->error);
 $query = "CREATE TABLE entries(
   entry_id INT(20) NOT NULL AUTO_INCREMENT,
   title VARCHAR(20) NOT NULL,
-  pub_date VARCHAR(255) NOT NULL,
+  pub_date DATE NOT NULL,
+  content VARCHAR(255),
   user_id INT,
   topic_id INT,
   PRIMARY KEY (entry_id),
