@@ -11,7 +11,7 @@ if (isset($_POST['submit'])) {
 
     $title = mysqli_real_escape_string($conn, $_POST['title']);
     $content = mysqli_real_escape_string($conn, $_POST['content']);
-    $publishedDate = date('d/m/Y');
+    $publishedDate = date('Y/m/d');
 
     $topic_id_post = mysqli_real_escape_string($conn, $_POST['topics']);
     $select_topic_id = "SELECT topic_id FROM topics WHERE topic_id = '$topic_id_post'";
@@ -26,7 +26,7 @@ if (isset($_POST['submit'])) {
       exit();
     } else {
       //Check if input characters are valid
-      if (!preg_match("/^[a-zA-Z0-9]*$/", $title)) {
+      if (!preg_match("/^[a-zA-Z0-9 ]*$/", $title)) {
         header("Location: ../index.php?entryname=invalid");
         exit();
       } else {
@@ -56,3 +56,20 @@ if (isset($_POST['submit'])) {
     header("Location: ../index.php?somethinghappened");
     exit();
 }
+
+if (isset($_POST['delete_entry'])) {
+  include_once 'dbh.inc.php';
+
+  $topic_id = $_POST['topics'];
+  // First delete entries in selected topic
+  $sql = "DELETE FROM entries WHERE topic_id='$topic_id'";
+  mysqli_query($conn, $sql);
+
+  // Then delete the selected topic
+  $sql = "DELETE FROM topics WHERE topic_id='$topic_id'";
+  mysqli_query($conn, $sql);
+
+  //Redirect the user to the indexpage with deletedtopic=success
+  header("Location: ../index.php?delete_entry=success");
+}   header("Location: ../index.phpi_see_you_trying_to_access_this_file");
+    exit();

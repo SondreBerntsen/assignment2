@@ -2,3 +2,18 @@
   width: 60%;
   margin: 0 auto;
 }
+
+.deletebutton {
+    color: #ff4141;
+}
+
+.list-group-item {
+}
+
+.container {
+  margin-top: 20px;
+}
+
+.headerbutton {
+  margin-right: 5px;
+}

@@ -17,7 +17,7 @@ if (isset($_POST['submit'])) {
       exit();
     } else {
       //Check if input characters are valid
-      if (!preg_match("/^[a-zA-Z0-9]*$/", $topic_name)) {
+      if (!preg_match("/^[a-zA-Z0-9 ]*$/", $topic_name)) {
         header("Location: ../index.php?topicname=invalid");
         exit();
       } else {

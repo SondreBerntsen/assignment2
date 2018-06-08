@@ -8,6 +8,7 @@ include_once 'templates/header.php';
 <div class="container">
 <?php
 
+// Welcome message and create new entry button
 if (isset($_SESSION['u_type'])) {
   $username = $_SESSION['u_name'];
   echo '<div class="jumbotron">
@@ -17,9 +18,7 @@ if (isset($_SESSION['u_type'])) {
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entryModal">
               Create new entry!
             </button>
-        </div>
-
-';
+        </div>';
 }
  ?>
 
@@ -67,13 +66,52 @@ if (isset($_SESSION['u_type'])) {
       </div>
     </div>
 
-    <!-- NEW TOPIC FORM MODAL -->
+    <!-- Delete topic modal -->
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deletetopicmodal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Topic creation</h5>
+            <h5 class="modal-title" id="deletetopicmodaltitle">Delete topic</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="includes/deletetopic.inc.php" method="POST">
+              <div class="form-group">
+                <label for="exampleFormControlSelect1">Select topic</label>
+                <select class="form-control" name="topics">
+                  <?php
+                  $sql = "SELECT * FROM topics ORDER BY topic_id DESC LIMIT 0,6";
+                  $result = mysqli_query($conn, $sql);
+
+                  while ($row = mysqli_fetch_array($result)) {
+                      echo "<option name='topic_id' value='" . $row['topic_id'] . "'>" . $row['topic_name'] . "</option>";
+                  }
+                  ?>
+                </select>
+              </div>
+              <div class="alert alert-danger" role="alert">
+                Warning! Deleting topic will also delete all entries in selected topic.
+              </div>
+              <button type="submit" name="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="You will permanently delete topic!">
+                Delete topic
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- NEW TOPIC FORM MODAL -->
+
+    <div class="modal fade" id="newtopicmodal" tabindex="-1" role="dialog" aria-labelledby="newtopicmodal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="newtopicmodaltitle">Topic creation</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -97,31 +135,49 @@ if (isset($_SESSION['u_type'])) {
     <div class="col-sm-3">
       <div class="list-group">
 
-        <?php
-          $sql = "SELECT * FROM topics ORDER BY topic_id DESC LIMIT 0,6";
-          $result = mysqli_query($conn, $sql);
 
-          while ($row = mysqli_fetch_array($result)) {
-              echo '<a class=list-group-item list-group-item-action href=index.php?selected_topic=' . $row['topic_id'] . '>' . $row['topic_name'] . '</a>';
-          }
-
+          <?php
+          // New topic modal trigger button, is only shown if user is logged in
           if (isset($_SESSION['u_type'])) {
-            echo '<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+            echo '<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newtopicmodal">
                     Create new topic
                   </button>';
           }
 
-        ?>
 
+          //Showing all topics
+          $sql = "SELECT * FROM topics ORDER BY topic_id DESC LIMIT 0,6";
+          $result = mysqli_query($conn, $sql);
+
+          while ($row = mysqli_fetch_array($result)) {
+              echo '
+              <a class=list-group-item list-group-item-action href=index.php?selected_topic=' . $row['topic_id'] . '>' . $row['topic_name'] . '</a>
+              ';
+
+          }
+          //Shows delete topic button if user is logged in as administrator
+          if (isset($_SESSION['u_id']) && $_SESSION['u_type'] == 'administrator') {
+            echo '<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletetopicmodal">
+                    Edit topics
+                  </button>';
+          }
+        ?>
       </div>
     </div>
+
+    <!-- displaying entries and author of entry -->
     <div class="col">
       <?php
+      // Selects all entries from selected topic.
       if (isset($_GET['selected_topic'])) {
-        $selected_entries = $_GET['selected_topic'];
-        $sql = "SELECT * FROM entries WHERE topic_id = $selected_entries";
-        $result = mysqli_query($conn, $sql);
+      $selected_entries = $_GET['selected_topic'];
+      $sql = "SELECT * FROM entries WHERE topic_id = $selected_entries";
+      $result = mysqli_query($conn, $sql);
+      $resultCheck = mysqli_num_rows($result);
+    }
 
+      // If there are no entries code below is not run to select and display entries.
+      if (isset($_GET['selected_topic']) && $resultCheck > 0) {
 
         $uid_query = "SELECT user_id FROM entries WHERE topic_id = '$selected_entries'";
         $uid_from_entries = mysqli_query($conn, $uid_query);
@@ -144,7 +200,34 @@ if (isset($_SESSION['u_type'])) {
           			    </div>
           				</div>';
         }
+
+      } elseif (isset($_GET['selected_topic'])) {
+        echo '<div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">There are no entries in this topic.</h5>
+                  <p class="card-text">If you are a registered user, log in and create the first one!</p>
+                </div>
+              </div>';
+
+
+      } else {
+        echo '<div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Select a topic!</h5>
+                </div>
+              </div>';
       }
+
+      // Displays message for user when no matches for keyword is found.
+      if (isset($_GET['searchresults']) && $_GET['searchresults'] == 0) {
+        echo '<div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">No matches for your search!</h5>
+                  <p class="card-text">Try using a different keyword or dropping some coins in a well for luck!</p>
+                </div>
+              </div>';
+      }
+
       ?>
 
 
